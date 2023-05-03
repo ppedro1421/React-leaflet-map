@@ -1,21 +1,29 @@
 import { MapContainer, TileLayer, LayersControl } from 'react-leaflet'
-//import { Marker, Popup, Circle, ImageOverlay } from 'react-leaflet'
+// eslint-disable-next-line
+import { Marker, Popup, Circle, Rectangle } from 'react-leaflet'
 
 import './css/leaflet.css'
 
 //var L = require('leaflet');
 const center = [-22.906138, -43.174528]
 
+// Bounds
+const worldBound = [[-180, 180], [180, -180]]
+const southAmericaBound = [[-60, 30], [20, -140]]
+
 function Map() {
   return (
     <div id="map">
-      <MapContainer 
-        center={center} 
+      <MapContainer
+        center={center}
         zoom={8}
+        zoomSnap={0.5}
+        zoomDelta={0.5}
         minZoom={3}
+        maxZoom={18}
         scrollWheelZoom={true}
         worldCopyJump={true}
-        maxBounds={[[-180, 180], [180, -180]]}
+        maxBounds={worldBound}
         maxBoundsViscosity={0.99}
       >
         <LayersControl position="topright">
@@ -31,6 +39,16 @@ function Map() {
               url="https://api.mapbox.com/styles/v1/mapbox/satellite-streets-v11/tiles/{z}/{x}/{y}?access_token=pk.eyJ1IjoibXNsZWUiLCJhIjoiclpiTWV5SSJ9.P_h8r37vD8jpIH1A6i1VRg"
             />
           </LayersControl.BaseLayer>
+          <LayersControl.Overlay name='South America Bound'>
+            <Rectangle bounds={southAmericaBound} name='South America Bound'>
+              <Popup>South America Bound</Popup>
+            </Rectangle>
+          </LayersControl.Overlay>
+          <LayersControl.Overlay name='World Bound'>
+            <Rectangle bounds={worldBound} name='World Bound'>
+              <Popup>World Bound</Popup>
+            </Rectangle>
+          </LayersControl.Overlay>
         </LayersControl>
       </MapContainer>
     </div>
