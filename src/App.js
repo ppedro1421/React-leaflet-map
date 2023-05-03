@@ -4,12 +4,20 @@ import { MapContainer, TileLayer, LayersControl } from 'react-leaflet'
 import './css/leaflet.css'
 
 //var L = require('leaflet');
-const center = [-22.41358, -42.98126]
+const center = [-22.906138, -43.174528]
 
 function Map() {
   return (
     <div id="map">
-      <MapContainer center={center} zoom={10} minZoom={2} scrollWheelZoom={true}>
+      <MapContainer 
+        center={center} 
+        zoom={8}
+        minZoom={3}
+        scrollWheelZoom={true}
+        worldCopyJump={true}
+        maxBounds={[[-180, 180], [180, -180]]}
+        maxBoundsViscosity={0.99}
+      >
         <LayersControl position="topright">
           <LayersControl.BaseLayer name="openstreetmap" checked={true}>
             <TileLayer
