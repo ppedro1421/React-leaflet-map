@@ -30,7 +30,7 @@ const createRoutineMachineLayer = () => {
         geocoder: L.Control.Geocoder.nominatim(),
         language: 'pt-BR',
         // Backend
-        serviceUrl: 'http://10.21.1.69:5000/route/v1',
+        // serviceUrl: 'Your Backend',
     });
 
     return instance;
