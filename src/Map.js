@@ -1,80 +1,88 @@
 
-import React, { useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import {
-    TileLayer,
     MapContainer,
+    TileLayer,
     LayersControl,
-    Marker,
-    Circle,
-    Popup,
-    LayerGroup,
     useMapEvents,
+    useMap,
+    Popup,
 } from "react-leaflet";
+import L from "leaflet";
 
-import { 
-    LeafletElement,
-} from "@react-leaflet/core";
+import 'primeicons/primeicons.css';
 
-import RoutingControl from './RoutingControl';
+import './css/leaflet.css';
+import './css/leafletRouting.css';
+import './css/site.css';
 
-// function LocationMarker() {
-//     const [position, setPosition] = useState(null)
-//     const map = useMapEvents({
-//         click() {
-//             map.locate()
-//             console.log('Click')
-//         },
-//         locationfound(e) {
-//             setPosition(e.latlng)
-//             console.log(e.latlng)
-//             map.flyTo(e.latlng, map.getZoom())
-//             console.log(position)
-//         },
-//     })
+import RoutingMachine from './RoutingControl';
 
-//     return position === null ? null : (
-//         <Marker position={position}>
-//             <Popup> {position.lat} {position.lng} </Popup>
-//         </Marker>
-//     )
-// }
-
-function CreateMarker() {
-    const [position, setPosition] = useState(null)
-  
-    const map = useMapEvents({
-        click(e) {
-            console.log(e.latlng)
-            setPosition(e.latlng)
-        },
-    })
-
-    return position === null ? null : (
-        <Marker position={position}>
-            <Popup>
-                <div>
-                    <button onClick={(e) => console.log(1)}>Start from this location</button>
-                    <button onClick={(e) => console.log(2)}>Go to this location</button>
-                </div>
-            </Popup>
-        </Marker>
-    )
-}
 
 const Map = () => {
-    // eslint-disable-next-line
-    const [map, setMap] = useState(null);
+    const routingMachineRef = useRef();
 
     // Center
-    const center = [-22.906138, -43.174528]
+    const center = [-22.906138, -43.174528];
 
     // Bounds
-    const worldBound = [[-180, 180], [180, -180]]
-    const southAmericaBound = [[-60, 30], [20, -140]]
+    const worldBound = [[-180, 180], [180, -180]];
+    // eslint-disable-next-line
+    const southAmericaBound = [[-60, 30], [20, -140]];
 
-    // Marcos
-    const RJ = [-22.906138, -43.174528]
-    const SP = [-23.535141, -46.623467]
+    function CreateMarker() {
+        const [position, setPosition] = useState(null);
+        const map = useMap();
+
+        useMapEvents({
+            click(e) {
+                setPosition(e.latlng);
+            },
+        });
+
+        return position === null ? null : (
+            <Popup position={position}>
+                <div className="marker">
+                    <button className="marker-btn" onClick={() => [
+                        routingMachineRef.current.spliceWaypoints(0, 1, position),
+                        map.closePopup()
+
+                    ]}>Comece a partir deste local</button>
+                    <button className="marker-btn" onClick={() => [
+                        routingMachineRef.current.spliceWaypoints(routingMachineRef.current.getWaypoints().length - 1, 1, position),
+                        map.closePopup()
+
+                    ]}>Ir para este local</button>
+                </div>
+            </Popup>
+        )
+    }
+
+    function FindLocation() {
+        const map = useMap();
+        const container = L.DomUtil.create("button", "locate-btn");
+
+        container.addEventListener("click", () => {
+            map.locate().on("locationfound", function (e) {
+                map.flyTo(e.latlng, 14);
+            })
+        });
+
+        L.DomEvent.disableClickPropagation(container);
+
+        useEffect(() => {
+            if (map.getContainer().querySelector(".locate-btn") === null) {
+                try {
+                    map.getContainer().querySelector(".leaflet-routing-geocoders").appendChild(container)
+
+                } catch (err) {
+                    console.log('Error:', err)
+                }
+            }
+        });
+
+        return null;
+    }
 
     return (
         <>
@@ -89,19 +97,13 @@ const Map = () => {
                 maxBounds={worldBound}
                 maxBoundsViscosity={0.99}
                 style={{ height: "100vh", width: "100%", padding: 0 }}
-                // Set the map instance to state when ready:
-                whenCreated={map => setMap(map)}
             >
                 {/* *************** */}
-                {/* Pass in our custom control layer here, inside of the map container */}
+
+                <RoutingMachine ref={routingMachineRef} />
+
                 {/* *************** */}
-
-                <RoutingControl />
-
-                {/* <LocationMarker /> */}
-                <CreateMarker />
-
-                <LayersControl position="topright">
+                <LayersControl position="topleft">
                     <LayersControl.BaseLayer name="openstreetmap" checked={true}>
                         <TileLayer
                             attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
@@ -114,21 +116,13 @@ const Map = () => {
                             url="https://api.mapbox.com/styles/v1/mapbox/satellite-streets-v11/tiles/{z}/{x}/{y}?access_token=pk.eyJ1IjoibXNsZWUiLCJhIjoiclpiTWV5SSJ9.P_h8r37vD8jpIH1A6i1VRg"
                         />
                     </LayersControl.BaseLayer>
-                    <LayersControl.Overlay name="Marcos">
-                        <LayerGroup>
-                            <Circle center={RJ} radius={50000}>
-                                <Popup>
-                                    RJ
-                                </Popup>
-                            </Circle>
-                            <Circle center={SP} radius={50000}>
-                                <Popup>
-                                    RJ
-                                </Popup>
-                            </Circle>
-                        </LayerGroup>
-                    </LayersControl.Overlay>
                 </LayersControl>
+                {/* *************** */}
+
+                <CreateMarker />
+                <FindLocation />
+
+                {/* *************** */}
             </MapContainer>
         </>
     );
