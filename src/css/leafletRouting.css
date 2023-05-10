@@ -32,15 +32,15 @@
 */
 
 .leaflet-routing-alternatives-container {
-    background-image: url('C:\Users\monitor\Desktop\MapFront\map-app\public\logoGolden.png');
-    -webkit-background-size: 200px 60px;
-    background-size: 300px 80px;
-    background-repeat: no-repeat;
-    background-position: 40px 10px;
+    /*  background-image: url(''); */
+    /*  -webkit-background-size: 200px 60px; */
+    /*  background-size: 300px 80px; */
+    /*  background-repeat: no-repeat; */
+    /*  background-position: 40px 10px; */
 
     height: 100%;
     padding-top: 99px;
-    /* padding-bottom: 15px; */
+    /*  padding-bottom: 15px; */
     border-bottom: 1px solid #ccc;
 }
 
